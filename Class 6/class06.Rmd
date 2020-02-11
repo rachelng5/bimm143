@@ -1,0 +1,151 @@
+---
+title: "Class 6"
+author: "Rachel Ng"
+date: "January 23, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Functions
+
+## Sub Header 1
+
+### Sub Header 2
+
+plot(1:5, col = "red")
+
+```{r}
+# this is another plot in r
+plot(1:5)
+```
+
+## More about file import
+`read.table()` and friends for flat files
+for example: read.table("File name", "Header = TRUE/FALSE, sep = " ")
+
+```{r}
+#Reading test 1
+read.table("test1.txt", header = TRUE, sep = ",")
+#or
+read.csv("test1.txt")
+#Reading test 2
+read.table("test2.txt", header = TRUE, sep = "$")
+#Reading test 3
+read.table("test3.txt", header = FALSE)
+```
+
+Example function 1:
+```{r}
+add <- function(x, y=1) {
+ # Sum the input x and y
+ x + y
+}
+add(x=1, y=4)
+add(1, 4)
+```
+Let's use this functions on vectors
+```{r}
+add( c(1,2,4), c(1,2,4) )
+```
+
+What is this `range()` function?
+```{r}
+x<- c(4, 4, 10, 3, 11)
+max(x)
+min(x)
+```
+
+```{r}
+range(x)
+```
+
+```{r}
+rescale <- function(x) {
+  rng <-range(x)
+ (x - rng[1]) / (rng[2] - rng[1])
+}
+```
+
+```{r}
+rescale( c(1,2,NA,3,10) )
+```
+
+Let's improve rescale function to exclude NA
+```{r}
+rescale <- function(x) {
+  rng <-range(x, na.rm = TRUE)
+ (x - rng[1]) / (rng[2] - rng[1])
+}
+
+#trying it again
+rescale( c(1,2,NA,3,10) )
+```
+
+Rescale 3
+```{r}
+
+rescale3 <- function(x, na.rm = TRUE, plot = FALSE) {
+  
+  rng <-range(x, na.rm=na.rm, plot = FALSE)
+  
+  print("Hello")
+  
+  answer <- (x - rng[1]) / (rng[2] - rng[1])
+  
+  print("is it me you are looking for?")
+  
+  if(plot) {
+    plot(answer, typ="b", lwd=4)
+    }
+ 
+  print("I can see it in ...")
+ 
+  return(answer)
+}
+
+rescale3(1:10)
+```
+
+**SEE LECTURE 6 Hands-On worksheet for more about Range function**
+1. read.pdb returns list of class "pdb" with 8 elements
+file needs to be name of a PDB file
+2. trim.pdb returns a list with 7 elements based on selections of atoms, in this case A chain alpha carbons "elety""
+3. sse displays rectangles, which describe secondary strucutre of sequences
+
+
+```{r}
+library(bio3d)
+
+s1 <- read.pdb("4AKE") # kinase with drug
+s2 <- read.pdb("1AKE") # kinase no drug
+s3 <- read.pdb("1E4Y") # kinase with drug
+
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s2.chainA <- trim.pdb(s2, chain="A", elety="CA")
+s3.chainA <- trim.pdb(s3, chain="A", elety="CA")
+
+s1.b <- s1.chainA$atom$b
+s2.b <- s2.chainA$atom$b
+s3.b <- s3.chainA$atom$b
+
+plotb3(s1.b, sse=s1.chainA, typ="l", ylab="Bfactor", helix.col = "red", sheet.col = "blue")s
+plotb3(s2.b, sse=s2.chainA, typ="l", ylab="Bfactor", helix.col = "red", sheet.col = "blue")
+plotb3(s3.b, sse=s3.chainA, typ="l", ylab="Bfactor", helix.col = "red", sheet.col = "blue")
+
+hc <- hclust( dist( rbind(s1.b, s2.b, s3.b) ) )
+plot(hc)
+```
+
+4. **plotting on the same graph**
+```{r}
+plotb3(s1.b, sse=s1.chainA, lwd = 2, typ="l", col="black", ylab="Bfactor", helix.col = "red", sheet.col = "blue")
+points(s2.b, typ="l", col="red", lwd=2)
+points(s3.b, typ="l", col="green", lwd=1)
+
+```
+
+
+
