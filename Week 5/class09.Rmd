@@ -1,0 +1,136 @@
+---
+title: "Lecture 5"
+author: "Rachel Ng"
+date: "February 4, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Clustering
+### K-means clustering algorithm
+A. break observations into k pre-defined number of clusters
+B. define K the number of clusters!
+i. kmeans keep track of total variance and does whole thing over w/ different points
+ii. after many iterations, kmeans clustering knows best clustering so-far i.e. the one with smallest total variation with clusters
+C. in 2 dimension the Pythagoreum theorem is used
+D. in R:
+kmeans(x, centers = ..., nstarts = ...)
+i. Input x is a numeric matrix, or data.frame, with
+one observation per row, one feature per column
+ii. k-means has a random component 
+iii. best outcome based on total w/i cluster sum of squares
+E. determining number of clusters
+i. systematically try a range of different K values and plot a 'screen plot'
+
+```{r}
+#Generate some exapmle data for clustering
+tmp <- c(rnorm(30,-3), rnorm(30,3))
+x <- cbind(x=tmp, y=rev(tmp))
+
+plot(x)
+```
+
+Use the kmeans() function setting k to 2 and nstart=20
+Inspect/print the results
+Q. How many points are in each cluster?
+Q. What ‘component’ of your result object details
+ - cluster size?
+ - cluster assignment/membership?
+ shown by clustering vector: which cluster each member is assigned to
+ - cluster center?
+
+```{r}
+km <- kmeans(x, centers =2, nstart = 20)
+print(km)
+
+#cluster size
+km$cluster
+
+#cluster length
+length(km$cluster)
+
+table(km$cluster)
+```
+ 
+ 
+Plot x colored by the kmeans cluster assignment and
+ add cluster centers as blue points
+```{r}
+plot(x, col=km$cluster)
+points(km$centers, col = "blue", pch = 15)
+```
+ 
+###Hierarchial clustering
+A. simple: each point starts as its own clsuter
+B. important: calculate point (dis)similarity as Euclidean distance b/w observations before calling
+C. lots more utility than kmeans, but have to spell out what you would like to do
+
+The main Hclustering fucniton in R is called `hclust()`
+```{r}
+dist_matrix <- dist(x) 
+hc <- hclust(dist(x))
+
+#plotting dendrogram
+plot(hc)
+abline(h=6, col = "red", lty = 2)
+
+```
+To get cluster membership vector I need to "cut" the tree at a certain height to yield my seprate cluster branches
+
+```{r}
+cutree(hc, h = 6)
+
+plot(hc)
+abline(h=6, col = "blue")
+abline(h=4, col = "red")
+```
+```{r}
+cutree(hc, h = 4)
+```
+
+Example 2:
+
+```{r}
+#Step 1. Generate data
+y <- rbind(
+ matrix(rnorm(100, mean=0, sd = 0.3), ncol = 2), # c1
+ matrix(rnorm(100, mean = 1, sd = 0.3), ncol = 2), # c2
+ matrix(c(rnorm(50, mean = 1, sd = 0.3), # c3
+ rnorm(50, mean = 0, sd = 0.3)), ncol = 2))
+colnames(x) <- c("x", "y")
+
+# Step 2. Plot the data without clustering
+plot(y)
+# Step 3. Generate colors for known clusters
+# (just so we can compare to hclust results)
+col <- as.factor( rep(c("c1","c2","c3"), each=50) )
+plot(y, col=col)
+```
+ Use the dist(), hclust(), plot() and cutree()
+ functions to return 2 and 3 clusters
+Q. How does this compare to your known 'col' groups?
+```{r}
+di <- dist(y)
+plot(di)
+```
+
+
+```{r}
+hc <- hclust(dist(y))
+plot(hc)
+abline(h = 1.8, col = "red")
+
+#to get cluster membership vector use `cutree()` 
+#to tabulate how many members in each cluster we have use `table()`
+grps <- cutree(hc, k=3)
+table(grps)
+```
+
+###Dimensionality reduciton, visualization, and structure analysis
+A. PCs are ranked by their importance i.e new plot axis
+i. PC1 is more important than PC2 which is more important than PC3..
+ii. want Pc1 to have the moset variacne
+
