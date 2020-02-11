@@ -2,8 +2,7 @@
 title: "Homework_Lecture_6"
 author: "Rachel Ng"
 date: "January 27, 2020"
-output:
-  pdf_document: default
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
