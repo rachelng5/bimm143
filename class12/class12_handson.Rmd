@@ -9,6 +9,7 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+#Part1
  determine the percentage of structures solved by X-Ray and Electron Microscopy. Also can
 you determine what proportion of structures are protein? 
 ```{r}
@@ -30,4 +31,33 @@ round(((sum(stats$Proteins) / sum(stats$Total))*100),2)
 
 
 ```
+
+#Part 2
+
+read a sinble PDB structure into R
+```{r}
+library(bio3d)
+
+pdb <- read.pdb("1hsg")
+pdb
+
+#Calpha atoms = number of residues
+```
+```{r}
+attributes(pdb)
+```
+
+## select protein only atoms
+
+Here I will use the `atoms.select()` function
+
+```{r}
+prot <- atom.select(pdb, "protein", value=TRUE)
+```
+
+Write out these new PDB objects with the `write.pdb()` fucntion.
+```{r}
+write.pdb(prot, file = "1hsg_protein.pdb")
+```
+
 
