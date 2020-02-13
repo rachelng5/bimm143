@@ -1,0 +1,33 @@
+---
+title: "class12"
+author: "Rachel Ng"
+date: "February 13, 2020"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+ determine the percentage of structures solved by X-Ray and Electron Microscopy. Also can
+you determine what proportion of structures are protein? 
+```{r}
+#read in file
+stats <- read.csv("Data Export Summary.csv", row.names=1)
+
+#calculate precentage values for each 'method'
+xrayper <- (stats$Total[1]/sum(stats$Total))*100
+xrayper
+
+#all percentages in a table
+ans <- stats$Total / sum(stats$Total)*100
+names(ans) <- rownames(stats)
+round(ans,2)
+ans
+
+#proteins percentage
+round(((sum(stats$Proteins) / sum(stats$Total))*100),2)
+
+
+```
+
