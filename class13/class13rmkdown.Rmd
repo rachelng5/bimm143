@@ -1,0 +1,54 @@
+---
+title: "class13handson"
+author: "Rachel Ng"
+date: "February 18, 2020"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(bio3d)
+file.name <- get.pdb("1HSG")
+```
+
+```{r}
+hiv <- read.pdb(file.name)
+resid <- atom.select(hiv, "protein", value=FALSE)
+```
+
+Q1: What is the name of the two non protein resid values in this structure? What does resid
+correspond to and how would you get a listing of all reside values in this structure? 
+A. Non protein/nucleic resid. values are: HOH, and MK1
+B. use of `atom.select()`
+resid <- atom.select(hiv, "protein", value=FALSE)
+
+#Prepare initial protein and ligand input files
+first have to extract just the protein atoms...
+
+```{r}
+prot <- trim.pdb(hiv, "protein")
+lig <- trim.pdb(hiv, "ligand")
+
+#writing out new pdb files
+write.pdb(prot, file = "1hsg_protein.pdb")
+write.pdb(lig, file = "1hsg_ligand.pdb")
+```
+
+#Using AutoDockTools to setup protein docking input
+```{r}
+library(bio3d)
+res <- read.pdb("all.pdbqt", multi = T)
+write.pdb(res, "results.pdb")
+```
+Using `rmsd()` to compare ligand function
+```{r}
+#res <- read.pdb("all.pdbqt", multi = TRUE)
+ori <- read.pdb("ligand.pdbqt")
+rmsd(ori, res)
+
+```
+
+
