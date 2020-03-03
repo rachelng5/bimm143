@@ -1,0 +1,59 @@
+---
+title: "Stuff"
+author: "Rachel Ng"
+date: "March 2, 2020"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+load bio3d
+```{r}
+library(bio3d)
+```
+
+get FASTA file written
+```{r}
+fas <- read.fasta("seqdump (4).txt")
+```
+
+Heatmap
+```{r}
+seqid <- seqidentity(fas, normalize=TRUE, similarity=FALSE, ncore=1, nseg.scale=1)
+heatmap(seqid)
+```
+
+##atomic resolution structures
+
+
+
+```{r}
+mat <- matrix
+```
+
+```{r}
+bl2 <- blast.pdb(con[[1]])
+```
+
+###homoblast
+```{r}
+head(bl2)
+```
+
+```{r}
+ann <- pdb.annotate(bl2[["hit.tbl"]][["subjectids"]])
+```
+
+```{r}
+head(ann)
+```
+
+##writing pdb for VMD
+```{r}
+pdb<- read.pdb("4YN0")
+prot <- trim.pdb(pdb, "protein")
+write.pdb(prot, file = "findagene.pdb")
+```
+
