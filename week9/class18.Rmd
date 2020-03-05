@@ -76,3 +76,71 @@ lollipopPlot(vars, gene='KRAS')
 lollipopPlot(vars, gene='TP53')
 ```
 
+#Part 2: designing a personalized vaccination
+```{r}
+library(bio3d)
+seqs <- read.fasta("lecture18_sequences.fa")
+```
+
+Using the conserv function:
+`conserv()` Quantifies residue conservation in a given protein sequence alignment by calculating the degree of amino acid variability in each column of the alignment.
+Finding where residue conservation variablity is less than 1 and storing it in mutant.sites
+
+```{r}
+## Calculate positional identity scores (non-identicals)
+ide <- conserv(seqs$ali, method="identity")
+mutant.sites <- which(ide < 1) 
+mutant.sites
+```
+We are including gap positions here and this is not what we want! So we need to exclude the gap positions:
+
+```{r}
+##exclude gap positions from analysis
+gaps <- gap.inspect(seqs)
+gaps$row
+
+##column number of gaps
+gaps$t.inds
+
+##positions with no gaps (non-gaps)
+gaps$f.inds
+```
+
+Find the overlap between mutant.sites and non-gaps
+```{r}
+mutant.sites <- mutant.sites[mutant.sites %in% gaps$f.inds]
+mutant.sites
+```
+
+Find the -8 before and -8 after (i.e. all the sequence segment containign all possible 9-mer sequences w tumor specific amino acids)
+
+```{r}
+start <- mutant.sites - 8
+end <- mutant.sites + 8
+
+```
+
+
+```{r}
+## Make a "names" label for our output sequences (one per mutant)
+mutant.names <- paste0(seqs$ali["P53_wt",mutant.sites],
+                       mutant.sites,
+                       seqs$ali["P53_mutant",mutant.sites])
+
+# Blank matrix to store sub-sequences
+storeseq <- matrix("-", nrow=length(mutant.sites), ncol=17)
+rownames(storeseq) <- mutant.names
+
+## Extract each sub-sequence
+for(i in 1:length(mutant.sites)) {
+  storeseq[i,] <- seqs$ali["P53_mutant",start[i]:end[i]]
+}
+
+storeseq
+```
+
+```{r}
+## Output a FASTA file for further analysis
+write.fasta(seqs=storeseq, ids=mutant.names, file="subsequences.fa")
+```
+
