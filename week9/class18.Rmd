@@ -1,0 +1,78 @@
+---
+title: "class18: cancer genomics datasets""
+author: "Rachel Ng"
+date: "3/5/2020"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Connect to the NCI-GDC database
+
+The NCI-GDC (cancer genomics commons) is a major portal for cancer genomics data.
+
+Here we use the bioconductor package **GenomicDataCommons** to talk to this database and download data etc. all from R
+
+```{r}
+library(GenomicDataCommons)
+library(TCGAbiolinks)
+library(maftools)
+```
+
+##Querying the GDC from R
+
+The pipe operator can be useful in R and someitmes is more clear to read.
+```{r}
+c(1:10) %>% mean() == mean(c(1:10))
+```
+
+Note that the **facet()** and **aggregations()** functions here are from the GenomicDataCommons package and act to group all cases by the project id and then count them up.
+
+```{r}
+cases_by_project <- cases() %>%
+  facet("project.project_id") %>%
+  aggregations()
+head(cases_by_project)
+```
+
+### Plot this overview data
+```{r}
+x<- cases_by_project$project.project_id
+head(x)
+barplot(log(x$doc_count), names.arg = x$key, las = 2)
+
+#las = 2 turns x-axis labels vertical
+```
+
+## Variant analysis with R
+Read in the MAF file we found
+```{r}
+maf.file <- GDCquery_Maf(tumor="PAAD", pipelines = "mutect")
+head(maf.file)
+```
+
+```{r}
+vars = read.maf(maf = maf.file, verbose = FALSE)
+```
+
+```{r}
+plotmafSummary(vars)
+```
+
+
+## Oncoplots
+
+```{r}
+oncostrip(maf=vars, genes=c("KRAS", "TP53"))
+```
+
+Another plot focusing on KRAS in our particular dataset.
+```{r}
+lollipopPlot(vars, gene='KRAS')
+```
+```{r}
+lollipopPlot(vars, gene='TP53')
+```
+
